@@ -6,7 +6,8 @@ FROM amazeeio/php:7.2-cli-drupal
 COPY composer.json /app/
 COPY scripts /app/scripts
 RUN composer install --no-dev
-COPY . /app
+RUN ./vendor/bin/laravel new testapp
+COPY testapp /app
 
 # Define where the Drupal Root is located
 ENV WEBROOT=web
