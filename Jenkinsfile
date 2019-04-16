@@ -5,7 +5,7 @@
   }
   environment {
     DOCKER_CREDS = credentials('amazeeiojenkins-dockerhub-password')
-    COMPOSE_PROJECT_NAME = "denpal-${BUILD_ID}"
+    COMPOSE_PROJECT_NAME = "laravel-distro-${BUILD_ID}"
   }
   stages {
     stage('Docker login') {
@@ -53,13 +53,13 @@
         echo "Branch: $GIT_BRANCH"
         docker images | head
 
-        for variant in '' _nginx _php; do
-            docker tag denpal$variant amazeeiodevelopment/denpal$variant:$GIT_BRANCH
-            docker push amazeeiodevelopment/denpal$variant:$GIT_BRANCH
+        for variant in ''; do
+            echo docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
+            echo docker push amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
 
             if [ $GIT_BRANCH = "develop" ]; then
-              docker tag denpal$variant amazeeiodevelopment/denpal$variant:latest
-              docker push amazeeiodevelopment/denpal$variant:latest
+              echo docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:latest
+              echo docker push amazeeiodevelopment/laravel-distro$variant:latest
             fi
 
         done
