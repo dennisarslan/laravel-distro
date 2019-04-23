@@ -41,6 +41,7 @@
           echo "FAIL"
           /bin/false
         fi
+        docker-compose exec -T blog ls -al storage/logs
         docker-compose logs blog
         docker-compose down
         '''

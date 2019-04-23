@@ -12,6 +12,7 @@ COPY blog /app
 COPY composer.json /app
 RUN ln -s /app /application
 RUN composer install --dev
+RUN chmod -R 777 storage
 
 # Installing PHP dependencies
 RUN docker-php-ext-install pcntl
