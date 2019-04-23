@@ -52,12 +52,12 @@
         docker images | head
 
         for variant in ''; do
-            echo docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
-            echo docker push amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
+            docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
+            docker push amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
 
             if [ $GIT_BRANCH = "develop" ]; then
-              echo docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:latest
-              echo docker push amazeeiodevelopment/laravel-distro$variant:latest
+              docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:latest
+              docker push amazeeiodevelopment/laravel-distro$variant:latest
             fi
 
         done
