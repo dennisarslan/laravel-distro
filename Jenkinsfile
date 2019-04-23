@@ -42,6 +42,7 @@
           /bin/false
         fi
         docker-compose exec -T blog ls -al storage/logs
+        docker-compose exec -T blog cat storage/logs/laravel-2019-04-23.log
         docker-compose logs blog
         docker-compose down
         '''
