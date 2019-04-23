@@ -31,10 +31,10 @@ x-user:
 
 services:
 
-  cli: # cli container, will be used for executing composer and any local commands (drush, drupal, etc.)
+  blog: # cli container, will be used for executing composer and any local commands (drush, drupal, etc.)
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.blog
     image: laravel-distro
     labels:
       # Lagoon Labels
@@ -47,7 +47,15 @@ services:
     #  - container:amazeeio-ssh-agent
     environment:
       << : *default-environment # loads the defined environment variables from the top
+    ports:
+      - "9000:9000"
 
-networks:
-  amazeeio-network:
-    external: true
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8000:8000"
+    volumes:
+      - .cloud/nginx.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./:/application:cached
+    depends_on:
+      - blog
