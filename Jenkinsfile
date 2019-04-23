@@ -41,6 +41,7 @@
           echo "FAIL"
           /bin/false
         fi
+        docker-compose logs blog
         docker-compose down
         '''
       }
