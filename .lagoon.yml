@@ -25,25 +25,3 @@ tasks:
     #    name: drush cim
     #    command: drush -y cim
     #    service: cli
-    - run:
-        name: drush updb
-        command: drush -y updb
-        service: cli
-# Todo: This works locally, but this breaks the run from Jenkins
-# Error: no alias record could be found for source @master                 [error]
-#    - run:
-#        name: drush sql-sync
-#        command: drush sql-sync @master @self
-#        service: cli
-    - run:
-        name: drush cr
-        command: drush -y cr
-        service: cli
-
-environments:
-  master:
-    cronjobs:
-      - name: drush cron
-        schedule: "*/15 * * * *"
-        command: drush cron
-        service: cli
