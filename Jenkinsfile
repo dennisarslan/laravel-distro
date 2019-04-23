@@ -27,7 +27,7 @@
     stage('Waiting') {
       steps {
         sh """
-        sleep 1s
+        sleep 10s
         """
       }
     }
