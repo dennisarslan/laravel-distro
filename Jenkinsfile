@@ -34,7 +34,7 @@
     stage('Verification') {
       steps {
         sh '''
-        docker-compose exec -T blog curl http://blog:9000 -v
+        docker-compose exec -T blog curl http://nginx:8000 -v
         if [ $? -eq 0 ]; then
           echo "OK!"
         else
