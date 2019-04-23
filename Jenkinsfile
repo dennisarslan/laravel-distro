@@ -27,13 +27,14 @@
     stage('Waiting') {
       steps {
         sh """
-        sleep 10s
+        sleep 1s
         """
       }
     }
     stage('Verification') {
       steps {
         sh '''
+        docker-compose exec -T blog curl php artisan key:generate --ansi
         docker-compose exec -T blog curl http://nginx:8000 -v
         if [ $? -eq 0 ]; then
           echo "OK!"
