@@ -18,7 +18,6 @@
     stage('Docker Build') {
       steps {
         sh '''
-        docker network create amazeeio-network || true
         docker-compose config -q
         docker-compose down
         docker-compose up -d --build "$@"
@@ -28,15 +27,14 @@
     stage('Waiting') {
       steps {
         sh """
-        sleep 5s
+        sleep 1s
         """
       }
     }
     stage('Verification') {
       steps {
         sh '''
-        docker-compose exec -T cli drush status
-        docker-compose exec -T cli curl http://nginx:8080 -v
+        docker-compose exec -T blog curl http://blog:9000 -v
         if [ $? -eq 0 ]; then
           echo "OK!"
         else
