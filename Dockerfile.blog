@@ -11,7 +11,7 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY blog /app
 COPY composer.json /app
 RUN ln -s /app /application
-RUN composer install --no-dev
+RUN composer install --dev
 
 # Define where the Drupal Root is located
 ENV WEBROOT=web
