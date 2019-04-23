@@ -13,5 +13,8 @@ COPY composer.json /app
 RUN ln -s /app /application
 RUN composer install --dev
 
+# Installing PHP dependencies
+RUN docker-php-ext-install pcntl
+
 # Define where the Drupal Root is located
 ENV WEBROOT=web
