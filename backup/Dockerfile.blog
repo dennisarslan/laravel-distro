@@ -1,9 +1,4 @@
 FROM amazeeio/php:7.2-fpm
-#FROM amazeeio/php:7.2-cli-drupal
-
-# We don't need the composer.lock file
-# COPY composer.json composer.lock /app/
-#COPY scripts /app/scripts
 
 # Installing composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -17,5 +12,5 @@ RUN chmod -R 777 storage
 # Installing PHP dependencies
 RUN docker-php-ext-install pcntl
 
-# Define where the Drupal Root is located
-ENV WEBROOT=web
+# Define where the Laravel Root is located
+ENV WEBROOT=public

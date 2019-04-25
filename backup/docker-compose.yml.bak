@@ -1,0 +1,65 @@
+version: '2.3'
+
+x-lagoon-project:
+  # Lagoon project name (leave `&lagoon-project` when you edit this)
+  &lagoon-project laravel-distro
+  &cli-image laravel-distro
+
+x-volumes:
+  &default-volumes
+    # Define all volumes you would like to have real-time mounted into the docker containers
+    volumes:
+      - .:/test:delegated
+      # Todo: This doesn't work with Docker-in-Docker, it mounts the wrong mount point!
+      # - "/Users/dennisarslan/Dropbox/Amazee/workspace:/app:delegated"
+      # - .:/app:delegated
+
+x-environment:
+  &default-environment
+    LAGOON_PROJECT: *lagoon-project
+    # Route that should be used locally, if you are using pygmy, this route *must* end with .docker.amazee.io
+    LAGOON_ROUTE: http://laravel-distro.docker.amazee.io
+    # Uncomment if you like to have the system behave like in production
+    #LAGOON_ENVIRONMENT_TYPE: production
+    # Uncomment to enable xdebug and then restart via `docker-compose up -d`
+    XDEBUG_ENABLE: "true"
+
+x-user:
+  &default-user
+    # The default user under which the containers should run. Change this if you are on linux and run with another user than id `1000`
+    user: '1000'
+
+services:
+
+  blog: # cli container, will be used for executing composer and any local commands (drush, drupal, etc.)
+    build:
+      context: .
+      dockerfile: Dockerfile.blog
+    image: laravel-distro
+    labels:
+      # Lagoon Labels
+      lagoon.type: cli-persistent
+      lagoon.persistent.name: nginx # mount the persistent storage of nginx into this container
+      lagoon.persistent: /app/public/ # location where the persistent storage should be mounted
+      # << : *default-volumes # loads the defined volumes from the top
+    user: root
+    # volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
+    #  - container:amazeeio-ssh-agent
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+    ports:
+      - "9000"
+    # ports:
+    #  - "9000:9000"
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "8000"
+    # ports:
+    #  - "8000:8000"
+    volumes:
+      - .cloud/nginx.conf:/etc/nginx/conf.d/default.conf:cached
+      - ./:/application:cached
+    depends_on:
+      - blog

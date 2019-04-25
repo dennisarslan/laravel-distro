@@ -1,0 +1,18 @@
+#FROM amazeeio/php:7.2-cli-drupal
+FROM amazeeio/php:7.2-fpm
+
+# Installing composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+# Configure source and packages
+COPY blog /app
+COPY composer.json /app
+RUN ln -s /app /application
+RUN composer install --dev
+RUN chmod -R 777 storage
+
+# Installing PHP dependencies
+RUN docker-php-ext-install pcntl
+
+# Define where the Laravel Root is located
+ENV WEBROOT=public

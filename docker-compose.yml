@@ -3,7 +3,7 @@ version: '2.3'
 x-lagoon-project:
   # Lagoon project name (leave `&lagoon-project` when you edit this)
   &lagoon-project laravel-distro
-  &cli-image laravel-distro
+  &cli-image laravel
 
 x-volumes:
   &default-volumes
@@ -31,35 +31,92 @@ x-user:
 
 services:
 
-  blog: # cli container, will be used for executing composer and any local commands (drush, drupal, etc.)
+  cli: # cli container, will be used for executing composer and any local commands (drush, drupal, etc.)
     build:
       context: .
-      dockerfile: Dockerfile.blog
-    image: laravel-distro
+      dockerfile: Dockerfile.cli
+    image: laravel
     labels:
       # Lagoon Labels
       lagoon.type: cli-persistent
       lagoon.persistent.name: nginx # mount the persistent storage of nginx into this container
-      lagoon.persistent: /app/public/ # location where the persistent storage should be mounted
-      # << : *default-volumes # loads the defined volumes from the top
+      lagoon.persistent: /app/storage/app/public/ # location where the persistent storage should be mounted
+    << : *default-volumes # loads the defined volumes from the top
     user: root
     # volumes_from: # mount the ssh-agent from the pygmy or cachalot ssh-agent
     #  - container:amazeeio-ssh-agent
     environment:
       << : *default-environment # loads the defined environment variables from the top
-    ports:
-      - "9000"
-    # ports:
-    #  - "9000:9000"
 
   nginx:
-    image: nginx:alpine
-    ports:
-      - "8000"
-    # ports:
-    #  - "8000:8000"
-    volumes:
-      - .cloud/nginx.conf:/etc/nginx/conf.d/default.conf:cached
-      - ./:/application:cached
+    build:
+      context: .
+      dockerfile: Dockerfile.nginx
+      args:
+        CLI_IMAGE: laravel
+    image: laravel_nginx
+    labels:
+      lagoon.type: nginx-php-persistent
+      lagoon.persistent: /app/storage/app/public/ # define where the persistent storage should be mounted too
+    << : *default-volumes # loads the defined volumes from the top
+    << : *default-user # uses the defined user from top
     depends_on:
-      - blog
+      - cli # basically just tells docker-compose to build the cli first
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+      LAGOON_LOCALDEV_URL: nginx-drupal-example.docker.amazee.io # generate another route for nginx, by default we go to varnish
+    networks:
+      - amazeeio-network
+      - default
+    ports:
+      - 8080
+
+  php:
+    build:
+      context: .
+      dockerfile: Dockerfile.php
+      args:
+        CLI_IMAGE: laravel
+    image: laravel_php
+    labels:
+      lagoon.type: nginx-php-persistent
+      lagoon.name: nginx # we want this service be part of the nginx pod in Lagoon
+      lagoon.persistent: /app/storage/app/public/ # define where the persistent storage should be mounted too
+    << : *default-volumes # loads the defined volumes from the top
+    << : *default-user # uses the defined user from top
+    depends_on:
+      - cli # basically just tells docker-compose to build the cli first
+    environment:
+      << : *default-environment # loads the defined environment variables from the top
+    ports:
+      - 9000
+
+  mariadb:
+    image: amazeeio/mariadb-drupal
+    labels:
+      lagoon.type: mariadb
+    ports:
+      - "3306" # exposes the port 3306 with a random local port, find it with `docker-compose port mariadb 3306`
+    << : *default-user # uses the defined user from top
+    environment:
+      << : *default-environment
+
+  varnish:
+    image: amazeeio/varnish-drupal
+    labels:
+      lagoon.type: varnish
+    links:
+      - nginx # links varnish to the nginx in this docker-compose project, or it would try to connect to any nginx running in docker
+    << : *default-user # uses the defined user from top
+    environment:
+      << : *default-environment
+      VARNISH_BYPASS: "true" # by default we bypass varnish, change to 'false' or remove in order to tell varnish to cache if possible
+    networks:
+      - amazeeio-network
+      - default
+    ports:
+      - 8080
+
+networks:
+  amazeeio-network:
+    external: true
