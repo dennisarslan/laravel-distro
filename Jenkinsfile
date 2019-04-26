@@ -38,7 +38,7 @@
             sh '''
             docker-compose exec -T cli php -r \"file_exists('.env') || copy('.env.example', '.env');\"
             docker-compose exec -T cli php artisan key:generate --ansi
-            docker-compose exec -T cli curl http://nginx:8000 -v
+            echo docker-compose exec -T cli curl http://nginx:8000 -v
             if [ $? -eq 0 ]; then
               echo "OK!"
             else
