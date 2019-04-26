@@ -36,18 +36,18 @@
         script {
           try {
             sh '''
-            docker-compose exec -T blog php -r \"file_exists('.env') || copy('.env.example', '.env');\"
-            docker-compose exec -T blog php artisan key:generate --ansi
-            docker-compose exec -T blog curl http://nginx:8000 -v
+            docker-compose exec -T cli php -r \"file_exists('.env') || copy('.env.example', '.env');\"
+            docker-compose exec -T cli php artisan key:generate --ansi
+            docker-compose exec -T cli curl http://nginx:8000 -v
             if [ $? -eq 0 ]; then
               echo "OK!"
             else
               echo "FAIL"
               /bin/false
             fi
-            echo docker-compose exec -T blog ls -al storage/logs
-            echo docker-compose exec -T blog cat storage/logs/laravel-2019-04-23.log
-            docker-compose logs blog
+            echo docker-compose exec -T cli ls -al storage/logs
+            echo docker-compose exec -T cli cat storage/logs/laravel-2019-04-23.log
+            docker-compose logs cli
             docker-compose down
             '''
           }
