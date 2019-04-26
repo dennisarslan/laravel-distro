@@ -64,13 +64,13 @@
         echo "Branch: $GIT_BRANCH"
         docker images | head
 
-        for variant in ''; do
-            docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
-            docker push amazeeiodevelopment/laravel-distro$variant:$GIT_BRANCH
+        for variant in '' _nginx _php; do
+            docker tag laravel$variant amazeeiodevelopment/laravel$variant:$GIT_BRANCH
+            docker push amazeeiodevelopment/laravel$variant:$GIT_BRANCH
 
             if [ $GIT_BRANCH = "develop" ]; then
-              docker tag laravel-distro$variant amazeeiodevelopment/laravel-distro$variant:latest
-              docker push amazeeiodevelopment/laravel-distro$variant:latest
+              docker tag laravel$variant amazeeiodevelopment/laravel$variant:latest
+              docker push amazeeiodevelopment/laravel$variant:latest
             fi
 
         done
