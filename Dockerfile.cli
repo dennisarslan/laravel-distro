@@ -15,8 +15,8 @@ RUN chmod -R 777 storage
 RUN docker-php-ext-install pcntl
 
 # Laravel requirements
-php -r \"file_exists('.env') || copy('.env.example', '.env');\"
-php artisan key:generate --ansi
+RUN cp .env.example .env
+RUN php artisan key:generate --ansi
 
 # Define where the Laravel Root is located
 ENV WEBROOT=public
